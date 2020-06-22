@@ -47,6 +47,7 @@ func (ssa *simpeSql) run() {
 	//	log.Printf("%v", pp)
 	//}
 }
+
 func main() {
 	conf := config.NewAppConfig()
 	SimpleSqlApp(conf).run()
