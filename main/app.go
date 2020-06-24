@@ -31,21 +31,24 @@ func (ssa *simpeSql) run() {
 
 	productService := services.NewProductService(ssa.db)
 
-	prod, err := productService.CreateAProduct("KGB", "Sofa", "5403a1a0-5520-11ea-bb2b-9378803a9e60")
-	if err != nil {
-		log.Print(err)
-	} else {
-		log.Print(*prod)
-	}
-	//products := productService.GetProducts(1, 2)
-	//products := productService.GetProductsIn([]string{"DEA", "ZZZ"})
-	//for _, p := range products {
-	//	log.Printf("%v %v %v %v %v", p.ProductId, p.ProductCode, p.ProductName, p.ProductCategory.CateogryId, p.ProductCategory.CategoryName)
-
-	//prods := productService.GetProductWithPrice()
-	//for _, pp := range prods {
-	//	log.Printf("%v", pp)
+	//prod, err := productService.CreateAProduct("BYU", "Wastafel", "5403a1a0-5520-11ea-bb2b-9378803a9e60")
+	//if err != nil {
+	//	log.Print(err)
+	//} else {
+	//	log.Print(*prod)
 	//}
+
+	products := productService.GetProducts(1, 2)
+	//products := productService.GetProductsIn([]string{"DEA", "ZZZ"})
+	for _, p := range products {
+		log.Printf("%v %v %v %v %v", p.ProductId, p.ProductCode, p.ProductName, p.ProductCategory.CateogryId, p.ProductCategory.CategoryName)
+	}
+
+	prods := productService.GetProductWithPrice()
+	for _, pp := range prods {
+		log.Printf("%v", pp)
+	}
+
 }
 
 func main() {
