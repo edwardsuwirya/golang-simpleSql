@@ -1,17 +1,19 @@
-package models
+package product
 
 import (
 	"database/sql"
+	"github.com/edwardsuwirya/simpleSql/domains/category"
+	"github.com/edwardsuwirya/simpleSql/utils/appSql"
 	guuid "github.com/google/uuid"
 	"log"
 	"strings"
 )
 
 type Product struct {
-	ProductId       string
-	ProductCode     string
-	ProductName     string
-	ProductCategory Category
+	ProductId       string            `json:"productId"`
+	ProductCode     string            `json:"productCode"`
+	ProductName     string            `json:"productName"`
+	ProductCategory category.Category `json:"category"`
 }
 
 func AllProduct(db *sql.DB, pageNo, totalPerPage int) ([]*Product, error) {
@@ -79,25 +81,47 @@ func FindProductIn(db *sql.DB, ids []string) ([]*Product, error) {
 
 	return products, nil
 }
-func CreateProduct(db *sql.DB, product *Product) (string, error) {
-	tx, err := db.Begin()
-	if err != nil {
-		log.Fatalf("%v", err)
-		return "", err
-	}
-	stmt, err := db.Prepare("INSERT INTO m_product(id,product_code,product_name,category_id)  VALUES(?, ?, ?, ?)")
-	if err != nil {
-		tx.Rollback()
-		log.Fatalf("%v", err)
-		return "", err
-	}
-	defer stmt.Close()
 
-	id := guuid.New()
-	if _, err := stmt.Exec(id, product.ProductCode, product.ProductName, product.ProductCategory.CateogryId); err != nil {
-		tx.Rollback()
+func FindProductByCode(db *sql.DB, code string) (*Product, error) {
+	row := db.QueryRow(`
+		SELECT p.id,p.product_code,p.product_name,p.category_id
+		FROM m_product p WHERE p.product_code = ?`, code)
+
+	p := new(Product)
+	err := row.Scan(&p.ProductId, &p.ProductCode, &p.ProductName, &p.ProductCategory.CateogryId)
+	if err != nil {
 		log.Fatalf("%v", err)
+		return nil, err
+	}
+
+	return p, nil
+}
+
+func CountProduct(db *sql.DB) (int, error) {
+	row := db.QueryRow(`
+		SELECT count(*)
+		FROM m_product`)
+
+	var totalRow int
+	err := row.Scan(&totalRow)
+	if err != nil {
+		log.Fatalf("%v", err)
+		return -1, err
+	}
+
+	return totalRow, nil
+}
+
+func CreateProduct(db *sql.DB, product *Product) (string, error) {
+	res, err := appSql.WithTransaction(db, func(tx *sql.Tx) (interface{}, error) {
+		id := guuid.New()
+		_, err := tx.Exec("INSERT INTO m_product(id,product_code,product_name,category_id)  VALUES(?, ?, ?, ?)", id, product.ProductCode, product.ProductName, product.ProductCategory.CateogryId)
+		return id.String(), err
+	})
+
+	if err != nil {
 		return "", err
 	}
-	return id.String(), tx.Commit()
+	return res.(string), nil
+
 }

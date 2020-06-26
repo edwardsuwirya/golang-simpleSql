@@ -2,53 +2,38 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/edwardsuwirya/simpleSql/config"
-	"github.com/edwardsuwirya/simpleSql/models"
-	"github.com/edwardsuwirya/simpleSql/services"
+	"github.com/edwardsuwirya/simpleSql/domains"
+	"github.com/gorilla/mux"
 	"log"
+	"net/http"
 )
 
-type simpeSql struct {
-	db *sql.DB
+type SimpeSql struct {
+	db        *sql.DB
+	appRouter *mux.Router
+	config    *config.Conf
 }
 
-func SimpleSqlApp(c *config.Conf) *simpeSql {
-	db, err := models.InitDB(c)
+func SimpleSqlApp(c *config.Conf) *SimpeSql {
+	db, err := domains.InitDB(c)
 	if err != nil {
 		log.Panic(err)
 	}
-	return &simpeSql{db: db}
+
+	mainAppRouter := mux.NewRouter()
+
+	return &SimpeSql{db: db, appRouter: mainAppRouter, config: c}
 }
 
-func (ssa *simpeSql) run() {
-	//billService := services.NewBillService(env.db)
-	//newBill := billService.CreateABill(8, 4, 12000, 8)
-	//if newBill != nil {
-	//	log.Print(*newBill)
-	//}
-	//sales := billService.TotalSales()
-	//log.Printf("%v", humanize.Commaf(sales))
-
-	productService := services.NewProductService(ssa.db)
-
-	//prod, err := productService.CreateAProduct("BYU", "Wastafel", "5403a1a0-5520-11ea-bb2b-9378803a9e60")
-	//if err != nil {
-	//	log.Print(err)
-	//} else {
-	//	log.Print(*prod)
-	//}
-
-	products := productService.GetProducts(1, 2)
-	//products := productService.GetProductsIn([]string{"DEA", "ZZZ"})
-	for _, p := range products {
-		log.Printf("%v %v %v %v %v", p.ProductId, p.ProductCode, p.ProductName, p.ProductCategory.CateogryId, p.ProductCategory.CategoryName)
+func (ssa *SimpeSql) run() {
+	NewAppRouter(ssa).InitMainRouter()
+	hostListen := fmt.Sprintf("%v:%v", ssa.config.Http.Host, ssa.config.Http.Port)
+	log.Printf("Ready to listen on %v", hostListen)
+	if err := http.ListenAndServe(hostListen, ssa.appRouter); err != nil {
+		log.Panic(err)
 	}
-
-	prods := productService.GetProductWithPrice()
-	for _, pp := range prods {
-		log.Printf("%v", pp)
-	}
-
 }
 
 func main() {

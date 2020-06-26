@@ -1,8 +1,7 @@
-package services
+package purchaseorder
 
 import (
 	"database/sql"
-	"github.com/edwardsuwirya/simpleSql/models"
 )
 
 type BillService struct {
@@ -13,21 +12,21 @@ func NewBillService(db *sql.DB) *BillService {
 	return &BillService{db}
 }
 
-func (bs *BillService) CreateABill(billId int, productId int, sales float64, tax float64) *models.Bill {
-	bill := models.Bill{
+func (bs *BillService) CreateABill(billId int, productId int, sales float64, tax float64) *Bill {
+	bill := Bill{
 		BillId:    billId,
 		ProductId: productId,
 		Sales:     sales,
 		Tax:       tax,
 	}
-	err := models.CreateBill(bs.db, bill)
+	err := CreateBill(bs.db, bill)
 	if err != nil {
 		return nil
 	}
 	return &bill
 }
-func (bs *BillService) GetAllBill() []*models.Bill {
-	bills, err := models.AllBill(bs.db)
+func (bs *BillService) GetAllBill() []*Bill {
+	bills, err := AllBill(bs.db)
 	if err != nil {
 		return nil
 	}
@@ -35,7 +34,7 @@ func (bs *BillService) GetAllBill() []*models.Bill {
 }
 
 func (bs *BillService) TotalSales() float64 {
-	bills, err := models.TotalSales(bs.db)
+	bills, err := TotalSales(bs.db)
 	if err != nil {
 		return 0
 	}

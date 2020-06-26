@@ -4,6 +4,10 @@ import (
 	"github.com/edwardsuwirya/simpleSql/utils"
 )
 
+type httpConf struct {
+	Host string
+	Port string
+}
 type dbConf struct {
 	DbUser     string
 	DbPassword string
@@ -13,15 +17,18 @@ type dbConf struct {
 }
 
 type Conf struct {
-	Db dbConf
+	Db   dbConf
+	Http httpConf
 }
 
 func NewAppConfig() *Conf {
-	return &Conf{dbConf{
-		DbUser:     utils.ViperGetEnv("DB_USER", "root"),
-		DbPassword: utils.ViperGetEnv("DB_PASSWORD", "password"),
-		DbHost:     utils.ViperGetEnv("DB_HOST", "localhost"),
-		DbPort:     utils.ViperGetEnv("DB_PORT", "3306"),
-		SchemaName: utils.ViperGetEnv("DB_SCHEMA", "schema"),
-	}}
+	return &Conf{
+		dbConf{
+			DbUser:     utils.ViperGetEnv("DB_USER", "root"),
+			DbPassword: utils.ViperGetEnv("DB_PASSWORD", "password"),
+			DbHost:     utils.ViperGetEnv("DB_HOST", "localhost"),
+			DbPort:     utils.ViperGetEnv("DB_PORT", "3306"),
+			SchemaName: utils.ViperGetEnv("DB_SCHEMA", "schema"),
+		},
+		httpConf{Host: utils.ViperGetEnv("APP_HOST", ""), Port: utils.ViperGetEnv("APP_PORT", "8080")}}
 }
