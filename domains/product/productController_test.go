@@ -1,7 +1,6 @@
-package domains
+package product
 
 import (
-	"github.com/edwardsuwirya/simpleSql/domains/product"
 	myTest "github.com/edwardsuwirya/simpleSql/test"
 	"github.com/magiconair/properties/assert"
 	"net/http"
@@ -18,7 +17,7 @@ func TestGetProductRoute(t *testing.T) {
 	db := myTest.DbPrep()
 	defer db.Close()
 	rr := httptest.NewRecorder()
-	productControllerTest := product.NewProductController(db)
+	productControllerTest := NewProductController(db)
 	handler := http.HandlerFunc(productControllerTest.GetProduct())
 	handler.ServeHTTP(rr, req)
 
@@ -36,7 +35,7 @@ func TestGetProductByCodeRoute(t *testing.T) {
 	db := myTest.DbPrep()
 	defer db.Close()
 	rr := httptest.NewRecorder()
-	productControllerTest := product.NewProductController(db)
+	productControllerTest := NewProductController(db)
 	handler := http.HandlerFunc(productControllerTest.GetProduct())
 	handler.ServeHTTP(rr, req)
 
