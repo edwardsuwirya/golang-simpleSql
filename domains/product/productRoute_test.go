@@ -10,14 +10,15 @@ import (
 )
 
 func TestProductRoute(t *testing.T) {
-	t.Log("It should success init route with different prefix")
-	db := myTest.DbPrep()
-	defer db.Close()
-	a := mux.NewRouter()
-	NewProductRoute("/product-test").InitRoute(a, db)
+	t.Run("It should success init route with different prefix", func(t *testing.T) {
+		db := myTest.DbPrep()
+		defer db.Close()
+		a := mux.NewRouter()
+		NewProductRoute("/product-test").InitRoute(a, db)
 
-	rr := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/product-test", nil)
-	a.ServeHTTP(rr, req)
-	assert.Equal(t, rr.Code, 200)
+		rr := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", "/product-test", nil)
+		a.ServeHTTP(rr, req)
+		assert.Equal(t, rr.Code, 200)
+	})
 }

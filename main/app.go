@@ -17,7 +17,8 @@ type SimpeSql struct {
 }
 
 func SimpleSqlApp(c *config.Conf) *SimpeSql {
-	db, err := domains.InitDB(c)
+	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", c.Db.DbUser, c.Db.DbPassword, c.Db.DbHost, c.Db.DbPort, c.Db.SchemaName)
+	db, err := domains.NewDbInitialization(c.Db.DbEngine, dataSourceName).InitDB()
 	if err != nil {
 		log.Panic(err)
 	}

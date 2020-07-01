@@ -14,6 +14,7 @@ type dbConf struct {
 	DbHost     string
 	DbPort     string
 	SchemaName string
+	DbEngine   string
 }
 
 type Conf struct {
@@ -29,6 +30,7 @@ func NewAppConfig() *Conf {
 			DbHost:     utils.ViperGetEnv("DB_HOST", "localhost"),
 			DbPort:     utils.ViperGetEnv("DB_PORT", "3306"),
 			SchemaName: utils.ViperGetEnv("DB_SCHEMA", "schema"),
+			DbEngine:   utils.ViperGetEnv("DB_ENGINE", "mysql"),
 		},
 		httpConf{Host: utils.ViperGetEnv("APP_HOST", ""), Port: utils.ViperGetEnv("APP_PORT", "8080")}}
 }

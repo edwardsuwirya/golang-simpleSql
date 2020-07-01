@@ -5,11 +5,19 @@ import (
 	"github.com/edwardsuwirya/simpleSql/domains/productPrice"
 )
 
+type IProductService interface {
+	GetProductsPaging(pageNo, totalPerPage int) []*Product
+	GetProducts() []*Product
+	GetSingleProduct(field string, code string) *Product
+	GetProductsIn(ids []string) []*Product
+	CreateAProduct(newProduct *Product) (*Product, error)
+	GetProductWithPrice() []*productPrice.ProductPrice
+}
 type ProductService struct {
 	db *sql.DB
 }
 
-func NewProductService(db *sql.DB) *ProductService {
+func NewProductService(db *sql.DB) IProductService {
 	return &ProductService{db}
 }
 

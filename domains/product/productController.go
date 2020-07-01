@@ -1,7 +1,7 @@
 package product
 
 import (
-	"database/sql"
+	"fmt"
 	"github.com/edwardsuwirya/simpleSql/utils/appStatus"
 	myHttp "github.com/edwardsuwirya/simpleSql/utils/http"
 	errorMessage "github.com/edwardsuwirya/simpleSql/utils/message"
@@ -9,14 +9,13 @@ import (
 )
 
 type ProductController struct {
-	prodService *ProductService
-	parser      *myHttp.Parser
-	responder   myHttp.IResponder
+	productService IProductService
+	parser         *myHttp.Parser
+	responder      myHttp.IResponder
 }
 
-func NewProductController(db *sql.DB) *ProductController {
-	prodService := NewProductService(db)
-	return &ProductController{prodService, myHttp.NewParser(), myHttp.NewDefaultJSONResponder()}
+func NewProductController(productService IProductService) *ProductController {
+	return &ProductController{productService, myHttp.NewParser(), myHttp.NewDefaultJSONResponder()}
 }
 
 func (pc *ProductController) NewProduct() func(w http.ResponseWriter, r *http.Request) {
@@ -24,7 +23,7 @@ func (pc *ProductController) NewProduct() func(w http.ResponseWriter, r *http.Re
 		prod := new(Product)
 
 		pc.parser.Form(r, prod)
-		newProduct, err := pc.prodService.CreateAProduct(prod)
+		newProduct, err := pc.productService.CreateAProduct(prod)
 		if err != nil {
 			pc.responder.Error(w, http.StatusInternalServerError, errorMessage.NewErrorMessage(appStatus.Error))
 		}
@@ -41,12 +40,14 @@ func (pc *ProductController) GetProduct() func(w http.ResponseWriter, r *http.Re
 			keys = append(keys, k)
 		}
 
+		fmt.Println("=======")
+		fmt.Println(keys)
 		var prod interface{}
-		if len(keys) > 0 {
-			prod = pc.prodService.GetSingleProduct(keys[0], queries[keys[0]][0])
+		if len(keys) >= 1 {
+			prod = pc.productService.GetSingleProduct(keys[0], queries[keys[0]][0])
 		} else {
 			//resp.Error(w, http.StatusOK, errorMessage.NewErrorMessage(appStatus.StatusNotYetImplemented))
-			prod = pc.prodService.GetProducts()
+			prod = pc.productService.GetProducts()
 		}
 		pc.responder.Data(w, http.StatusOK, appStatus.StatusText(0), prod)
 

@@ -1,9 +1,8 @@
-package utils
+package appSql
 
 import (
 	"database/sql"
 	myTest "github.com/edwardsuwirya/simpleSql/test"
-	"github.com/edwardsuwirya/simpleSql/utils/appSql"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -22,7 +21,7 @@ func TestWithTransaction(t *testing.T) {
 	t.Log("It should commit transaction")
 	db := myTest.DbPrep()
 	defer db.Close()
-	res, err := appSql.WithTransaction(db, mockTransactional)
+	res, err := WithTransaction(db, mockTransactional)
 	assert.Nil(t, err)
 	assert.Equal(t, res, "test")
 }
@@ -31,6 +30,6 @@ func TestWithTransactionError(t *testing.T) {
 	t.Log("It should rollback transaction")
 	db := myTest.DbPrep()
 	defer db.Close()
-	_, err := appSql.WithTransaction(db, mockTransactionalRollback)
+	_, err := WithTransaction(db, mockTransactionalRollback)
 	assert.NotNil(t, err)
 }
